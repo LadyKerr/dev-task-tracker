@@ -249,3 +249,88 @@ textarea {
 .task-actions button:hover {
     opacity: 1;
 }
+
+.pomodoro-section {
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 1rem 0;
+    font-family: monospace;
+}
+
+.timer-status {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+.timer-presets {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.timer-preset-btn, #customTimerBtn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timer-preset-btn:hover, #customTimerBtn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.timer-preset-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.timer-controls button {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#startTimer {
+    background: var(--success-color);
+    color: white;
+}
+
+#pauseTimer {
+    background: var(--warning-color);
+    color: white;
+}
+
+#resetTimer {
+    background: var(--danger-color);
+    color: white;
+}
+
+.timer-controls button:hover {
+    opacity: 0.9;
+}

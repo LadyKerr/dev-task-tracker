@@ -13,6 +13,25 @@
             <div class="theme-toggle">🌙</div>
         </header>
         
+        <div class="pomodoro-section">
+            <h2>🍅 Pomodoro Timer</h2>
+            <div class="timer-display">
+                <span id="timerDisplay">25:00</span>
+                <div class="timer-status" id="timerStatus">Work Time</div>
+            </div>
+            <div class="timer-presets">
+                <button class="timer-preset-btn" data-work="15" data-break="5">15/5</button>
+                <button class="timer-preset-btn" data-work="30" data-break="10">30/10</button>
+                <button class="timer-preset-btn" data-work="60" data-break="20">60/20</button>
+                <button id="customTimerBtn">Custom</button>
+            </div>
+            <div class="timer-controls">
+                <button id="startTimer">Start</button>
+                <button id="pauseTimer">Pause</button>
+                <button id="resetTimer">Reset</button>
+            </div>
+        </div>
+
         <div class="main-content">
             <div class="add-task-section">
                 <h2>Add New Task</h2>

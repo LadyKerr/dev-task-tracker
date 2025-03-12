@@ -3,6 +3,14 @@ class TaskManager {
         this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         this.editingTaskId = null;
         this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+        this.timer = {
+            workTime: 25,
+            breakTime: 5,
+            timeLeft: 25 * 60,
+            isRunning: false,
+            isBreak: false,
+            intervalId: null
+        };
         this.setupEventListeners();
         this.updateUI();
         this.initializeTheme();
@@ -33,6 +41,63 @@ class TaskManager {
         
         // Add completion filter
         document.getElementById('completionFilter').addEventListener('change', () => this.filterTasks());
+
+        // Pomodoro timer event listeners
+        document.querySelectorAll('.timer-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const workTime = parseInt(btn.dataset.work);
+                const breakTime = parseInt(btn.dataset.break);
+                this.setTimerPreset(workTime, breakTime);
+            });
+        });
+
+        document.getElementById('customTimerBtn').addEventListener('click', () => {
+            const workTime = prompt('Enter work time in minutes:', '25');
+            const breakTime = prompt('Enter break time in minutes:', '5');
+            if (workTime && breakTime) {
+                this.setTimerPreset(parseInt(workTime), parseInt(breakTime));
+            }
+        });
+
+        document.getElementById('startTimer').addEventListener('click', () => this.startTimer());
+        document.getElementById('pauseTimer').addEventListener('click', () => this.pauseTimer());
+        document.getElementById('resetTimer').addEventListener('click', () => this.resetTimer());
+    }
+    
+    validateTaskInput(task) {
+        const errors = [];
+        
+        if (!task.title.trim()) {
+            errors.push('Title is required');
+        }
+        
+        if (!task.description.trim()) {
+            errors.push('Description is required');
+        }
+        
+        if (!task.dueDate) {
+            errors.push('Due date is required');
+        } else {
+            const dueDate = new Date(task.dueDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (isNaN(dueDate.getTime())) {
+                errors.push('Invalid due date format');
+            } else if (dueDate < today) {
+                errors.push('Due date cannot be in the past');
+            }
+        }
+        
+        if (!task.category) {
+            errors.push('Category is required');
+        }
+        
+        if (!task.priority) {
+            errors.push('Priority is required');
+        }
+        
+        return errors;
     }
 
     editTask(taskId) {
@@ -68,6 +133,14 @@ class TaskManager {
             completed: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).completed : false,
             createdAt: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString()
         };
+
+        const validationErrors = this.validateTaskInput(task);
+        
+        if (validationErrors.length > 0) {
+            const errorMessage = validationErrors.join('\n');
+            alert(errorMessage);
+            return;
+        }
 
         if (this.editingTaskId) {
             // Update existing task
@@ -174,31 +247,33 @@ class TaskManager {
     renderTasks(tasksToRender) {
         const tasksList = document.getElementById('tasksList');
         tasksList.innerHTML = '';
-
+    
         tasksToRender.forEach(task => {
             const taskElement = document.createElement('div');
             taskElement.className = `task-item ${task.category.toLowerCase().replace(' ', '-')} ${task.completed ? 'completed' : ''}`;
-            
-            taskElement.innerHTML = `
-                <div class="task-header">
-                    <h3 class="task-title">${task.title}</h3>
-                    <span class="task-category ${task.category.toLowerCase().replace(' ', '-')}">${task.category}</span>
-                </div>
-                <p class="task-description">${task.description}</p>
-                <div class="task-meta">
-                    <span>Due in ${this.calculateDueDate(task.dueDate)}</span>
-                    <div class="task-actions">
-                        <button onclick="taskManager.toggleTaskCompletion(${task.id})">
-                            ${task.completed ? '↩️' : '✓'}
-                        </button>
-                        <button onclick="taskManager.editTask(${task.id})">✏️</button>
-                        <button onclick="taskManager.deleteTask(${task.id})">🗑️</button>
-                    </div>
-                </div>
-            `;
-            
+            taskElement.innerHTML = this.createTaskTemplate(task);
             tasksList.appendChild(taskElement);
         });
+    }
+    
+    createTaskTemplate(task) {
+        return `
+            <div class="task-header">
+                <h3 class="task-title">${task.title}</h3>
+                <span class="task-category ${task.category.toLowerCase().replace(' ', '-')}">${task.category}</span>
+            </div>
+            <p class="task-description">${task.description}</p>
+            <div class="task-meta">
+                <span>Due in ${this.calculateDueDate(task.dueDate)}</span>
+                <div class="task-actions">
+                    <button onclick="taskManager.toggleTaskCompletion(${task.id})">
+                        ${task.completed ? '↩️' : '✓'}
+                    </button>
+                    <button onclick="taskManager.editTask(${task.id})">✏️</button>
+                    <button onclick="taskManager.deleteTask(${task.id})">🗑️</button>
+                </div>
+            </div>
+        `;
     }
 
     calculateDueDate(dueDate) {
@@ -208,7 +283,66 @@ class TaskManager {
         if (days === 1) return '1 day';
         return `${days} days`;
     }
+
+    setTimerPreset(workTime, breakTime) {
+        this.timer.workTime = workTime;
+        this.timer.breakTime = breakTime;
+        this.resetTimer();
+    }
+
+    startTimer() {
+        if (!this.timer.isRunning) {
+            this.timer.isRunning = true;
+            document.getElementById('startTimer').textContent = 'Running';
+            
+            this.timer.intervalId = setInterval(() => {
+                if (this.timer.timeLeft > 0) {
+                    this.timer.timeLeft--;
+                    this.updateTimerDisplay();
+                } else {
+                    this.handleTimerComplete();
+                }
+            }, 1000);
+        }
+    }
+
+    pauseTimer() {
+        if (this.timer.isRunning) {
+            clearInterval(this.timer.intervalId);
+            this.timer.isRunning = false;
+            document.getElementById('startTimer').textContent = 'Start';
+        }
+    }
+
+    resetTimer() {
+        this.pauseTimer();
+        this.timer.timeLeft = this.timer.workTime * 60;
+        this.timer.isBreak = false;
+        this.updateTimerDisplay();
+        document.getElementById('timerStatus').textContent = 'Work Time';
+    }
+
+    handleTimerComplete() {
+        const notification = new Notification("Pomodoro Timer", {
+            body: this.timer.isBreak ? "Break time is over! Time to work!" : "Work time is over! Time for a break!",
+            icon: "🍅"
+        });
+
+        this.timer.isBreak = !this.timer.isBreak;
+        this.timer.timeLeft = (this.timer.isBreak ? this.timer.breakTime : this.timer.workTime) * 60;
+        this.updateTimerDisplay();
+        document.getElementById('timerStatus').textContent = this.timer.isBreak ? 'Break Time' : 'Work Time';
+    }
+
+    updateTimerDisplay() {
+        const minutes = Math.floor(this.timer.timeLeft / 60);
+        const seconds = this.timer.timeLeft % 60;
+        const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('timerDisplay').textContent = display;
+    }
 }
 
 // Initialize the task manager
 const taskManager = new TaskManager();
+
+module.exports = TaskManager;
