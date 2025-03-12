@@ -12,8 +12,8 @@ Let's update this app using GitHub Copilot. We want to implement the following:
 - update code to use constants for magic strings (update hard coded selectors, etc.) 
 - open script.js and Copilot Chat, type `/test` to generate unit tests for the `TaskManager` class
 - Ask Copilot questions: 
-    - "is there anything in this file that can be refactored?" (open script.js file)
-    - "What about performance optimizations?" (open script.js file)
+    - "is there anything in this file that can be refactored?" (open script.js file - Chat mode) 
+    - "What about performance optimizations?" (open script.js file - Chat mode)
 
 ## Documentation:
 - update the readme for this project (attach all relevant files to the prompt)
