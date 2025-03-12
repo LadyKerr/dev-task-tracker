@@ -1,6 +1,7 @@
 class TaskManager {
     constructor() {
         this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        this.editingTaskId = null;
         this.isDarkMode = localStorage.getItem('darkMode') === 'true';
         this.setupEventListeners();
         this.updateUI();
@@ -31,19 +32,50 @@ class TaskManager {
         document.getElementById('priorityFilter').addEventListener('change', () => this.filterTasks());
     }
 
+    editTask(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        // Set editing mode
+        this.editingTaskId = taskId;
+
+        // Populate form with task data
+        document.getElementById('taskTitle').value = task.title;
+        document.getElementById('taskDescription').value = task.description;
+        document.getElementById('taskCategory').value = task.category;
+        document.getElementById('taskPriority').value = task.priority;
+        document.getElementById('taskDueDate').value = task.dueDate;
+
+        // Change form submit button
+        const submitButton = document.querySelector('#taskForm button[type="submit"]');
+        submitButton.textContent = 'Update Task';
+        
+        // Scroll to form
+        document.getElementById('taskForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
     addTask() {
         const task = {
-            id: Date.now(),
+            id: this.editingTaskId || Date.now(),
             title: document.getElementById('taskTitle').value,
             description: document.getElementById('taskDescription').value,
             category: document.getElementById('taskCategory').value,
             priority: document.getElementById('taskPriority').value,
             dueDate: document.getElementById('taskDueDate').value,
-            completed: false,
-            createdAt: new Date().toISOString()
+            completed: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).completed : false,
+            createdAt: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString()
         };
 
-        this.tasks.push(task);
+        if (this.editingTaskId) {
+            // Update existing task
+            this.tasks = this.tasks.map(t => t.id === this.editingTaskId ? task : t);
+            this.editingTaskId = null;
+            document.querySelector('#taskForm button[type="submit"]').textContent = 'Add Task';
+        } else {
+            // Add new task
+            this.tasks.push(task);
+        }
+
         this.saveTasks();
         this.updateUI();
         document.getElementById('taskForm').reset();
@@ -143,6 +175,7 @@ class TaskManager {
                         <button onclick="taskManager.toggleTaskCompletion(${task.id})">
                             ${task.completed ? '↩️' : '✓'}
                         </button>
+                        <button onclick="taskManager.editTask(${task.id})">✏️</button>
                         <button onclick="taskManager.deleteTask(${task.id})">🗑️</button>
                     </div>
                 </div>
