@@ -13,6 +13,25 @@
             <div class="theme-toggle">🌙</div>
         </header>
         
+        <div class="pomodoro-section">
+            <h2>🍅 Pomodoro Timer</h2>
+            <div class="timer-display">
+                <span id="timerDisplay">25:00</span>
+                <div class="timer-status" id="timerStatus">Work Time</div>
+            </div>
+            <div class="timer-presets">
+                <button class="timer-preset-btn" data-work="15" data-break="5">15/5</button>
+                <button class="timer-preset-btn" data-work="30" data-break="10">30/10</button>
+                <button class="timer-preset-btn" data-work="60" data-break="20">60/20</button>
+                <button id="customTimerBtn">Custom</button>
+            </div>
+            <div class="timer-controls">
+                <button id="startTimer">Start</button>
+                <button id="pauseTimer">Pause</button>
+                <button id="resetTimer">Reset</button>
+            </div>
+        </div>
+
         <div class="main-content">
             <div class="add-task-section">
                 <h2>Add New Task</h2>
@@ -50,6 +69,11 @@
                         <input type="date" id="taskDueDate" required>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="taskTags">Tags (comma-separated)</label>
+                        <input type="text" id="taskTags" placeholder="e.g., frontend, api, urgent">
+                    </div>
+                    
                     <button type="submit" class="add-task-btn">+ Add Task</button>
                 </form>
             </div>
@@ -67,6 +91,20 @@
                         <label>Priority:</label>
                         <select id="priorityFilter">
                             <option value="All">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tags:</label>
+                        <select id="tagFilter">
+                            <option value="All">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Completion:</label>
+                        <select id="completionFilter">
+                            <option value="All Tasks">All Tasks</option>
+                            <option value="Active">Active</option>
+                            <option value="Completed">Completed</option>
                         </select>
                     </div>
                 </div>
