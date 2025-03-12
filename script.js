@@ -134,8 +134,8 @@ class TaskManager {
             category: document.getElementById('taskCategory').value,
             priority: document.getElementById('taskPriority').value,
             dueDate: document.getElementById('taskDueDate').value,
-            completed: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).completed : false,
-            createdAt: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString(),
+            completed: this.editingTaskId && this.tasks.find(t => t.id === this.editingTaskId) ? this.tasks.find(t => t.id === this.editingTaskId).completed : false,
+            createdAt: this.editingTaskId && this.tasks.find(t => t.id === this.editingTaskId) ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString(),
             tags: document.getElementById('taskTags').value
                 .split(',')
                 .map(tag => tag.trim().toLowerCase())
@@ -148,6 +148,10 @@ class TaskManager {
             const errorMessage = validationErrors.join('\n');
             alert(errorMessage);
             return;
+        }
+
+        if (!Array.isArray(this.tasks)) {
+            this.tasks = [];
         }
 
         if (this.editingTaskId) {
