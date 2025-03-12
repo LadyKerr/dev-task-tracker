@@ -3,7 +3,7 @@
 Let's update this app using GitHub Copilot. We want to implement the following:
 
 ## Basic Task Management:
-- Add task editing functionality (Edit mode)
+- Add task editing functionality
 - allow users to see their completed tasks following this design #file: attach file (Agent Mode; VSCode Insider only)
 
 ## Code Quality Improvements:

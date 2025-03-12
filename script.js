@@ -30,6 +30,9 @@ class TaskManager {
         // Filter changes
         document.getElementById('categoryFilter').addEventListener('change', () => this.filterTasks());
         document.getElementById('priorityFilter').addEventListener('change', () => this.filterTasks());
+        
+        // Add completion filter
+        document.getElementById('completionFilter').addEventListener('change', () => this.filterTasks());
     }
 
     editTask(taskId) {
@@ -110,6 +113,7 @@ class TaskManager {
     filterTasks() {
         const categoryFilter = document.getElementById('categoryFilter').value;
         const priorityFilter = document.getElementById('priorityFilter').value;
+        const completionFilter = document.getElementById('completionFilter').value;
 
         let filteredTasks = [...this.tasks];
 
@@ -118,6 +122,11 @@ class TaskManager {
         }
         if (priorityFilter !== 'All') {
             filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
+        }
+        if (completionFilter !== 'All') {
+            filteredTasks = filteredTasks.filter(task => 
+                completionFilter === 'Completed' ? task.completed : !task.completed
+            );
         }
 
         this.renderTasks(filteredTasks);
@@ -153,6 +162,13 @@ class TaskManager {
         priorityFilter.innerHTML = priorities.map(priority => 
             `<option value="${priority}">${priority}</option>`
         ).join('');
+
+        const completionFilter = document.getElementById('completionFilter');
+        completionFilter.innerHTML = `
+            <option value="All">All Tasks</option>
+            <option value="Active">Active</option>
+            <option value="Completed">Completed</option>
+        `;
     }
 
     renderTasks(tasksToRender) {
