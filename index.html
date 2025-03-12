@@ -69,6 +69,11 @@
                         <input type="date" id="taskDueDate" required>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="taskTags">Tags (comma-separated)</label>
+                        <input type="text" id="taskTags" placeholder="e.g., frontend, api, urgent">
+                    </div>
+                    
                     <button type="submit" class="add-task-btn">+ Add Task</button>
                 </form>
             </div>
@@ -89,9 +94,15 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label>Tags:</label>
+                        <select id="tagFilter">
+                            <option value="All">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label>Completion:</label>
                         <select id="completionFilter">
-                            <option value="All">All Tasks</option>
+                            <option value="All Tasks">All Tasks</option>
                             <option value="Active">Active</option>
                             <option value="Completed">Completed</option>
                         </select>

@@ -23,5 +23,8 @@ Let's update this app using GitHub Copilot. We want to implement the following:
 - highlight a portion of your code, and click the sparkle icon that pops up and select "Review using Copilot" (this will generate a code review comment)
 
 
-## Stretch Feature:
+## Stretch Features:
 - Help me implement a pomodoro timer to help users stay focused with options for 15/5, 30/10, 60/20, and custom
+- Create a way to categorize tasks with custom tags
+- Add a filter to view tasks by category
+- Add a feature to export tasks as CSV

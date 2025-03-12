@@ -334,3 +334,25 @@ textarea {
 .timer-controls button:hover {
     opacity: 0.9;
 }
+
+.task-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.task-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    background: var(--primary-color);
+    color: white;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.task-tag:hover {
+    opacity: 1;
+}

@@ -42,6 +42,9 @@ class TaskManager {
         // Add completion filter
         document.getElementById('completionFilter').addEventListener('change', () => this.filterTasks());
 
+        // Add tag filter change event
+        document.getElementById('tagFilter').addEventListener('change', () => this.filterTasks());
+
         // Pomodoro timer event listeners
         document.querySelectorAll('.timer-preset-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -113,6 +116,7 @@ class TaskManager {
         document.getElementById('taskCategory').value = task.category;
         document.getElementById('taskPriority').value = task.priority;
         document.getElementById('taskDueDate').value = task.dueDate;
+        document.getElementById('taskTags').value = task.tags ? task.tags.join(', ') : '';
 
         // Change form submit button
         const submitButton = document.querySelector('#taskForm button[type="submit"]');
@@ -131,7 +135,11 @@ class TaskManager {
             priority: document.getElementById('taskPriority').value,
             dueDate: document.getElementById('taskDueDate').value,
             completed: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).completed : false,
-            createdAt: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString()
+            createdAt: this.editingTaskId ? this.tasks.find(t => t.id === this.editingTaskId).createdAt : new Date().toISOString(),
+            tags: document.getElementById('taskTags').value
+                .split(',')
+                .map(tag => tag.trim().toLowerCase())
+                .filter(tag => tag !== '')
         };
 
         const validationErrors = this.validateTaskInput(task);
@@ -187,6 +195,7 @@ class TaskManager {
         const categoryFilter = document.getElementById('categoryFilter').value;
         const priorityFilter = document.getElementById('priorityFilter').value;
         const completionFilter = document.getElementById('completionFilter').value;
+        const tagFilter = document.getElementById('tagFilter').value;
 
         let filteredTasks = [...this.tasks];
 
@@ -196,9 +205,14 @@ class TaskManager {
         if (priorityFilter !== 'All') {
             filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
         }
-        if (completionFilter !== 'All') {
+        if (completionFilter !== 'All Tasks') {
             filteredTasks = filteredTasks.filter(task => 
                 completionFilter === 'Completed' ? task.completed : !task.completed
+            );
+        }
+        if (tagFilter !== 'All') {
+            filteredTasks = filteredTasks.filter(task => 
+                task.tags && task.tags.includes(tagFilter.toLowerCase())
             );
         }
 
@@ -224,9 +238,11 @@ class TaskManager {
     updateFilters() {
         const categories = ['All', ...new Set(this.tasks.map(task => task.category))];
         const priorities = ['All', ...new Set(this.tasks.map(task => task.priority))];
+        const tags = ['All', ...new Set(this.tasks.flatMap(task => task.tags || []))];
 
         const categoryFilter = document.getElementById('categoryFilter');
         const priorityFilter = document.getElementById('priorityFilter');
+        const tagFilter = document.getElementById('tagFilter');
 
         categoryFilter.innerHTML = categories.map(category => 
             `<option value="${category}">${category}</option>`
@@ -234,6 +250,10 @@ class TaskManager {
 
         priorityFilter.innerHTML = priorities.map(priority => 
             `<option value="${priority}">${priority}</option>`
+        ).join('');
+
+        tagFilter.innerHTML = tags.map(tag => 
+            `<option value="${tag}">${tag === 'All' ? 'All' : '#' + tag}</option>`
         ).join('');
 
         const completionFilter = document.getElementById('completionFilter');
@@ -257,12 +277,19 @@ class TaskManager {
     }
     
     createTaskTemplate(task) {
+        const tagsHtml = task.tags && task.tags.length > 0
+            ? `<div class="task-tags">
+                ${task.tags.map(tag => `<span class="task-tag" onclick="taskManager.filterByTag('${tag}')">#${tag}</span>`).join('')}
+               </div>`
+            : '';
+
         return `
             <div class="task-header">
                 <h3 class="task-title">${task.title}</h3>
                 <span class="task-category ${task.category.toLowerCase().replace(' ', '-')}">${task.category}</span>
             </div>
             <p class="task-description">${task.description}</p>
+            ${tagsHtml}
             <div class="task-meta">
                 <span>Due in ${this.calculateDueDate(task.dueDate)}</span>
                 <div class="task-actions">
@@ -339,6 +366,11 @@ class TaskManager {
         const seconds = this.timer.timeLeft % 60;
         const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         document.getElementById('timerDisplay').textContent = display;
+    }
+
+    filterByTag(tag) {
+        document.getElementById('tagFilter').value = tag;
+        this.filterTasks();
     }
 }
 
